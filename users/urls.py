@@ -15,7 +15,11 @@ app_name = UsersConfig.name
 urlpatterns = [
     path("users/", UserListAPIView.as_view(), name="users_list"),
     path("users/<int:pk>/", UserRetrieveAPIView.as_view(), name="user_detail"),
-    path("users/register/", UserCreateAPIView.as_view(), name="user_register"),
+    path(
+        "users/register/",
+        UserCreateAPIView.as_view(permission_classes=(AllowAny,)),
+        name="user_register",
+    ),
     path(
         "users/delete/<int:pk>/",
         UserDestroyAPIView.as_view(),

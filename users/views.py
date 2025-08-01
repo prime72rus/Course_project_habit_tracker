@@ -2,10 +2,9 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import (
     CreateAPIView, DestroyAPIView, ListAPIView, RetrieveAPIView, UpdateAPIView
 )
-from rest_framework.permissions import AllowAny
 
 from users.models import User
-from users.serializers import UserSerializer
+from users.serializers import UserAdminSerializer, UserSerializer
 
 
 class UserListAPIView(ListAPIView):
@@ -17,13 +16,18 @@ class UserListAPIView(ListAPIView):
             return User.objects.all()
         return User.objects.filter(id=self.request.user.id)
 
+    def get_serializer_class(self):
+        if self.request.user.is_superuser:
+            return UserAdminSerializer
+        return UserSerializer
+
 
 class UserRetrieveAPIView(RetrieveAPIView):
     serializer_class = UserSerializer
     queryset = User.objects.all()
 
     def get_object(self):
-        user = super().request.user
+        user = super().get_object()
         request_user = self.request.user
         if request_user.is_superuser:
             return user
@@ -35,7 +39,6 @@ class UserRetrieveAPIView(RetrieveAPIView):
 
 
 class UserCreateAPIView(CreateAPIView):
-    permission_classes = (AllowAny,)
     serializer_class = UserSerializer
     queryset = User.objects.all()
 
@@ -44,13 +47,18 @@ class UserCreateAPIView(CreateAPIView):
         user.set_password(user.password)
         user.save()
 
+    def get_serializer_class(self):
+        if self.request.user.is_superuser:
+            return UserAdminSerializer
+        return UserSerializer
+
 
 class UserUpdateAPIView(UpdateAPIView):
     serializer_class = UserSerializer
     queryset = User.objects.all()
 
     def get_object(self):
-        user = super().request.user
+        user = super().get_object()
         request_user = self.request.user
         if request_user.is_superuser:
             return user
@@ -73,7 +81,7 @@ class UserDestroyAPIView(DestroyAPIView):
     queryset = User.objects.all()
 
     def get_object(self):
-        user = super().request.user
+        user = super().get_object()
         request_user = self.request.user
         if request_user.is_superuser:
             return user
