@@ -42,12 +42,14 @@ class Habit(models.Model):
     owner = models.ForeignKey(
         "users.User",
         on_delete=models.SET_NULL,
+        null=True,
         related_name="habits",
         verbose_name="Владелец",
     )
     place = models.ForeignKey(
         "Place",
         on_delete=models.SET_NULL,
+        null=True,
         related_name="habits",
         verbose_name="Место выполнения",
     )
