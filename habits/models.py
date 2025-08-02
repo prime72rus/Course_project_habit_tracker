@@ -2,29 +2,6 @@ from django.core.exceptions import ValidationError
 from django.db import models
 
 
-class Place(models.Model):
-    """
-    Модель места выполнения привычки
-    """
-    title = models.CharField(
-        max_length=150,
-        unique=True,
-        verbose_name="Название места",
-    )
-    description = models.TextField(
-        blank=True,
-        null=True,
-        verbose_name="Описание места",
-    )
-
-    class Meta:
-        verbose_name = "Место",
-        verbose_name_plural = "Места"
-
-    def __str__(self):
-        return self.title
-
-
 class Habit(models.Model):
     """
     Модель привычки
@@ -46,11 +23,8 @@ class Habit(models.Model):
         related_name="habits",
         verbose_name="Владелец",
     )
-    place = models.ForeignKey(
-        "Place",
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="habits",
+    place = models.CharField(
+        max_length=255,
         verbose_name="Место выполнения",
     )
     time_action = models.TimeField(
