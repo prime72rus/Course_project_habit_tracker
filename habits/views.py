@@ -8,7 +8,7 @@ from habits.serializers import HabitSerializer
 from users.permissions import IsAdminUser, IsOwner, IsSuperUser
 
 
-class HabibViewSet(viewsets.ModelViewSet):
+class HabitViewSet(viewsets.ModelViewSet):
     serializer_class = HabitSerializer
     pagination_class = HabitPaginator
     queryset = Habit.objects.all()
@@ -20,9 +20,7 @@ class HabibViewSet(viewsets.ModelViewSet):
     )
 
     def perform_create(self, serializer):
-        habit = serializer.save()
-        habit.owner = self.request.user
-        habit.save()
+        serializer.save(owner=self.request.user)
 
     def get_queryset(self):
         queryset = super().get_queryset()

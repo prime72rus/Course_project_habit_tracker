@@ -2,12 +2,12 @@ from django.urls import path
 from rest_framework.routers import DefaultRouter
 
 from habits.apps import HabitsConfig
-from habits.views import HabibViewSet, HabitPublicListAPIView
+from habits.views import HabitViewSet, HabitPublicListAPIView
 
 app_name = HabitsConfig.name
 
 router = DefaultRouter()
-router.register(r"habits", HabibViewSet, basename="habits")
+router.register(r"habits", HabitViewSet, basename="habits")
 
 urlpatterns = [
     path(
