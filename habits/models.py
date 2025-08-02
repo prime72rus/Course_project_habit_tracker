@@ -1,4 +1,4 @@
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, PermissionDenied
 from django.db import models
 
 
@@ -74,6 +74,9 @@ class Habit(models.Model):
         verbose_name_plural = "Привычки"
 
     def clean(self):
+        """
+        Валидация данных при сохранении экземпляра сущности
+        """
         if self.duration > 120:
             raise ValidationError(
                 {"duration":
