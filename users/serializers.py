@@ -13,10 +13,12 @@ class UserSerializer(serializers.ModelSerializer):
             "last_name",
             "phone",
             "city",
+            "chat_id",
+            "is_active",
         )
 
 
 class UserAdminSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = "__all__"
+        exclude = ("password",)

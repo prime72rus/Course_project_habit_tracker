@@ -1,4 +1,3 @@
-from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import (
     CreateAPIView,
     DestroyAPIView,
@@ -6,40 +5,28 @@ from rest_framework.generics import (
     RetrieveAPIView,
     UpdateAPIView,
 )
+from rest_framework.permissions import IsAuthenticated
 
 from users.models import User
+from users.permissions import IsSuperUser, IsAdminUser, IsOwner
 from users.serializers import UserAdminSerializer, UserSerializer
 
 
 class UserListAPIView(ListAPIView):
-    serializer_class = UserSerializer
+    serializer_class = UserAdminSerializer
     queryset = User.objects.all()
-
-    def get_queryset(self):
-        if self.request.user.is_superuser:
-            return User.objects.all()
-        return User.objects.filter(id=self.request.user.id)
-
-    def get_serializer_class(self):
-        if self.request.user.is_superuser:
-            return UserAdminSerializer
-        return UserSerializer
+    permission_classes = [IsAuthenticated, IsSuperUser | IsAdminUser]
 
 
 class UserRetrieveAPIView(RetrieveAPIView):
     serializer_class = UserSerializer
     queryset = User.objects.all()
+    permission_classes = [IsAuthenticated, IsSuperUser | IsAdminUser | IsOwner]
 
-    def get_object(self):
-        user = super().get_object()
-        request_user = self.request.user
-        if request_user.is_superuser:
-            return user
-        if user != request_user:
-            raise PermissionDenied(
-                "Вы можете просматривать только свой профиль"
-            )
-        return user
+    def get_serializer_class(self):
+        if self.request.user.is_superuser:
+            return UserAdminSerializer
+        return UserSerializer
 
 
 class UserCreateAPIView(CreateAPIView):
@@ -60,17 +47,12 @@ class UserCreateAPIView(CreateAPIView):
 class UserUpdateAPIView(UpdateAPIView):
     serializer_class = UserSerializer
     queryset = User.objects.all()
+    permission_classes = [IsAuthenticated, IsSuperUser | IsAdminUser | IsOwner]
 
-    def get_object(self):
-        user = super().get_object()
-        request_user = self.request.user
-        if request_user.is_superuser:
-            return user
-        if user != request_user:
-            raise PermissionDenied(
-                "Вы можете редактировать только свой профиль"
-            )
-        return user
+    def get_serializer_class(self):
+        if self.request.user.is_superuser:
+            return UserAdminSerializer
+        return UserSerializer
 
     def perform_update(self, serializer):
         if "password" in serializer.validated_data:
@@ -83,12 +65,4 @@ class UserUpdateAPIView(UpdateAPIView):
 
 class UserDestroyAPIView(DestroyAPIView):
     queryset = User.objects.all()
-
-    def get_object(self):
-        user = super().get_object()
-        request_user = self.request.user
-        if request_user.is_superuser:
-            return user
-        if user != request_user:
-            raise PermissionDenied("Вы можете удалить только свой профиль")
-        return user
+    permission_classes = [IsAuthenticated, IsSuperUser | IsAdminUser]
