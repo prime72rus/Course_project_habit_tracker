@@ -1,7 +1,8 @@
-from django.test import RequestFactory, TestCase
+from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient, APIRequestFactory, APITestCase
+from rest_framework.views import APIView
 
 from habits.models import Habit
 from users.models import User
@@ -154,10 +155,8 @@ class UserTests(APITestCase):
 
 
 class IsOwnerPermissionTests(TestCase):
-    """Тест разрешения IsOwner"""
-
     def setUp(self):
-        self.factory = RequestFactory()
+        self.factory = APIRequestFactory()
         self.user = User.objects.create(
             email="test@example.com", password="testpass"
         )
@@ -165,6 +164,11 @@ class IsOwnerPermissionTests(TestCase):
             email="other@example.com", password="otherpass"
         )
         self.permission = IsOwner()
+
+        class MockView(APIView):
+            pass
+
+        self.view = MockView()
 
         self.habit = Habit.objects.create(
             owner=self.user,
@@ -179,7 +183,9 @@ class IsOwnerPermissionTests(TestCase):
         request = self.factory.get("/")
         request.user = self.user
         self.assertTrue(
-            self.permission.has_object_permission(request, None, self.user)
+            self.permission.has_object_permission(
+                request, self.view, self.user
+            )
         )
 
     def test_permission_with_user_object_not_owner(self):
@@ -187,7 +193,9 @@ class IsOwnerPermissionTests(TestCase):
         request = self.factory.get("/")
         request.user = self.other_user
         self.assertFalse(
-            self.permission.has_object_permission(request, None, self.user)
+            self.permission.has_object_permission(
+                request, self.view, self.user
+            )
         )
 
     def test_permission_with_owned_object(self):
@@ -195,7 +203,9 @@ class IsOwnerPermissionTests(TestCase):
         request = self.factory.get("/")
         request.user = self.user
         self.assertTrue(
-            self.permission.has_object_permission(request, None, self.habit)
+            self.permission.has_object_permission(
+                request, self.view, self.habit
+            )
         )
 
     def test_permission_with_not_owned_object(self):
@@ -203,11 +213,13 @@ class IsOwnerPermissionTests(TestCase):
         request = self.factory.get("/")
         request.user = self.other_user
         self.assertFalse(
-            self.permission.has_object_permission(request, None, self.habit)
+            self.permission.has_object_permission(
+                request, self.view, self.habit
+            )
         )
 
     def test_permission_with_invalid_object_type(self):
-        """Тест для неподдерживаемого типа объекта (проверка return False)"""
+        """Тест для неподдерживаемого типа объекта"""
 
         class SomeOtherClass:
             pass
@@ -217,7 +229,9 @@ class IsOwnerPermissionTests(TestCase):
         some_object = SomeOtherClass()
 
         self.assertFalse(
-            self.permission.has_object_permission(request, None, some_object)
+            self.permission.has_object_permission(
+                request, self.view, some_object
+            )
         )
 
 

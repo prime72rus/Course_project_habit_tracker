@@ -7,6 +7,7 @@ class User(AbstractUser):
     Модель пользователя
     """
 
+    id: models.AutoField
     username = None
     email = models.EmailField(unique=True, verbose_name="Email")
     phone = models.CharField(
