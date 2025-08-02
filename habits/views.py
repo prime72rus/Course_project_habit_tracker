@@ -5,14 +5,19 @@ from rest_framework.permissions import IsAuthenticated
 from habits.models import Habit
 from habits.paginators import HabitPaginator
 from habits.serializers import HabitSerializer
-from users.permissions import IsAdminUser, IsSuperUser, IsOwner
+from users.permissions import IsAdminUser, IsOwner, IsSuperUser
 
 
 class HabibViewSet(viewsets.ModelViewSet):
     serializer_class = HabitSerializer
     pagination_class = HabitPaginator
     queryset = Habit.objects.all()
-    permission_classes = (IsAuthenticated, IsSuperUser, IsAdminUser, IsOwner,)
+    permission_classes = (
+        IsAuthenticated,
+        IsSuperUser,
+        IsAdminUser,
+        IsOwner,
+    )
 
     def perform_create(self, serializer):
         habit = serializer.save()
@@ -38,4 +43,4 @@ class HabibViewSet(viewsets.ModelViewSet):
 
 class HabitPublicListAPIView(ListAPIView):
     serializer_class = HabitSerializer
-    queryset = Habit.objects.filter(is_pablic=True)
+    queryset = Habit.objects.filter(is_public=True)

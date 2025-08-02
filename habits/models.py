@@ -6,6 +6,7 @@ class Habit(models.Model):
     """
     Модель привычки
     """
+
     PERIODICITY_CHOICES = [
         (1, "Ежедневно"),
         (2, "Раз в 2 дня"),
@@ -49,7 +50,7 @@ class Habit(models.Model):
     periodicity = models.PositiveSmallIntegerField(
         choices=PERIODICITY_CHOICES,
         default=1,
-        verbose_name="Периодичность (дни)"
+        verbose_name="Периодичность (дни)",
     )
     reward = models.CharField(
         max_length=255,
@@ -65,12 +66,11 @@ class Habit(models.Model):
         verbose_name="Признак публичности",
     )
     is_active = models.BooleanField(
-        default=True,
-        verbose_name="Признак активности привычки"
+        default=True, verbose_name="Признак активности привычки"
     )
 
     class Meta:
-        verbose_name = "Привычка",
+        verbose_name = ("Привычка",)
         verbose_name_plural = "Привычки"
 
     def clean(self):
@@ -79,14 +79,15 @@ class Habit(models.Model):
         """
         if self.duration > 120:
             raise ValidationError(
-                {"duration":
-                    "Время выполнения не должно превышать 120 секунд"}
+                {"duration": "Время выполнения не должно превышать 120 секунд"}
             )
 
         if self.periodicity > 7:
             raise ValidationError(
-                {"periodicity":
-                    "Нельзя выполнять привычку реже, чем 1 раз в 7 дней"}
+                {
+                    "periodicity": "Нельзя выполнять привычку реже,"
+                                   " чем 1 раз в 7 дней"
+                }
             )
 
         if self.is_pleasant_habit:
