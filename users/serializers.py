@@ -14,11 +14,39 @@ class UserSerializer(serializers.ModelSerializer):
             "phone",
             "city",
             "chat_id",
-            "is_active",
+            "password",
         )
+
+    def get_extra_kwargs(self):
+        extra_kwargs = super().get_extra_kwargs()
+        request = self.context.get("request")
+        if not request:
+            return extra_kwargs
+
+        extra_kwargs["password"] = {"write_only": True}
+
+        if request.method in [
+            "PUT",
+            "PATCH",
+        ]:
+            extra_kwargs["email"] = {"read_only": True}
+            extra_kwargs["id"] = {"read_only": True}
+        return extra_kwargs
 
 
 class UserAdminSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        exclude = ("password",)
+        fields = "__all__"
+
+    def get_extra_kwargs(self):
+        extra_kwargs = super().get_extra_kwargs()
+        request = self.context.get("request")
+
+        if not request.user.is_superuser and request.method in [
+            "PUT",
+            "PATCH",
+        ]:
+            extra_kwargs["email"] = {"read_only": True}
+            extra_kwargs["id"] = {"read_only": True}
+        return extra_kwargs
