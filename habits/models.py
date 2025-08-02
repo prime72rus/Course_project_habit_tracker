@@ -97,7 +97,7 @@ class Habit(models.Model):
                     " или связанной привычки"
                 )
 
-        if self.related_habit and not self.related_habit.is_pleasant:
+        if self.related_habit and not self.related_habit.is_pleasant_habit:
             raise ValidationError(
                 {"related_habit": "Связанная привычка должна быть приятной"}
             )
