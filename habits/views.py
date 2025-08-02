@@ -14,9 +14,7 @@ class HabitViewSet(viewsets.ModelViewSet):
     queryset = Habit.objects.all()
     permission_classes = (
         IsAuthenticated,
-        (IsSuperUser |
-        IsAdminUser |
-        IsOwner),
+        (IsSuperUser | IsAdminUser | IsOwner),
     )
 
     def perform_create(self, serializer):

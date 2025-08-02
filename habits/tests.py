@@ -1,6 +1,6 @@
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase, APIClient
+from rest_framework.test import APIClient, APITestCase
 
 from habits.models import Habit
 from users.models import User
@@ -8,6 +8,7 @@ from users.models import User
 
 class HabitTests(APITestCase):
     """Тестирование модели Habit"""
+
     def setUp(self):
         """Подготовка данных для тестирования"""
         self.client = APIClient()
@@ -59,16 +60,16 @@ class HabitTests(APITestCase):
     def test_create_habit(self):
         """Тест создания привычки"""
         self.client.force_authenticate(user=self.user)
-        url = reverse('habits:habits-list')
+        url = reverse("habits:habits-list")
         data = {
             "place": "Офис",
             "time_action": "12:00:00",
             "action": "Обеденный перерыв",
             "duration": 15,
             "periodicity": 1,
-            "is_public": False
+            "is_public": False,
         }
-        response = self.client.post(url, data, format='json')
+        response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Habit.objects.count(), 4)
         self.assertEqual(Habit.objects.last().owner, self.user)
@@ -126,13 +127,15 @@ class HabitTests(APITestCase):
             time_action="08:00:00",
             action="Просмотр ТВ",
             duration=121,
-            periodicity=1
+            periodicity=1,
         )
 
         with self.assertRaises(Exception) as context:
             invalid_habit.full_clean()
-        self.assertIn("Время выполнения не должно превышать 120 секунд",
-                      str(context.exception))
+        self.assertIn(
+            "Время выполнения не должно превышать 120 секунд",
+            str(context.exception),
+        )
 
     def test_habit_validation_periodicity(self):
         """Тест валидации модели привычки по периодичности"""
@@ -147,9 +150,10 @@ class HabitTests(APITestCase):
 
         with self.assertRaises(Exception) as context:
             invalid_habit.full_clean()
-        self.assertIn("Нельзя выполнять привычку реже,"
-                                   " чем 1 раз в 7 дней",
-                      str(context.exception))
+        self.assertIn(
+            "Нельзя выполнять привычку реже, " "чем 1 раз в 7 дней",
+            str(context.exception),
+        )
 
     def test_pleasant_habit_validation_reward(self):
         """Тест валидации приятной привычки и вознаграждения"""
@@ -166,8 +170,10 @@ class HabitTests(APITestCase):
 
         with self.assertRaises(Exception) as context:
             pleasant_habit.full_clean()
-        self.assertIn("Приятная привычка не может иметь вознаграждения",
-                      str(context.exception))
+        self.assertIn(
+            "Приятная привычка не может иметь вознаграждения",
+            str(context.exception),
+        )
 
     def test_related_and_reward_habit_validation(self):
         """Тест валидации связанной привычки и вознаграждения"""
@@ -185,9 +191,11 @@ class HabitTests(APITestCase):
 
         with self.assertRaises(Exception) as context:
             pleasant_habit.full_clean()
-        self.assertIn("Можно указать либо связанную привычку,"
-                " либо вознаграждение, но не оба",
-                      str(context.exception))
+        self.assertIn(
+            "Можно указать либо связанную привычку,"
+            " либо вознаграждение, но не оба",
+            str(context.exception),
+        )
 
     def test_related_pleasant_habit_validation(self):
         """Тест валидации связанной приятной привычки"""
@@ -204,8 +212,9 @@ class HabitTests(APITestCase):
 
         with self.assertRaises(Exception) as context:
             pleasant_habit.full_clean()
-        self.assertIn("Связанная привычка должна быть приятной",
-                      str(context.exception))
+        self.assertIn(
+            "Связанная привычка должна быть приятной", str(context.exception)
+        )
 
     def test_habit_string_representation(self):
         """Тест строкового представления привычки"""
@@ -220,7 +229,7 @@ class HabitTests(APITestCase):
                 time_action="08:00:00",
                 action=f"Действие {i}",
                 duration=30,
-                periodicity=1
+                periodicity=1,
             )
 
         self.client.force_authenticate(user=self.user)

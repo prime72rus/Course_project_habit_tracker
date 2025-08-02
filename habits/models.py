@@ -86,7 +86,7 @@ class Habit(models.Model):
             raise ValidationError(
                 {
                     "periodicity": "Нельзя выполнять привычку реже,"
-                                   " чем 1 раз в 7 дней"
+                    " чем 1 раз в 7 дней"
                 }
             )
 

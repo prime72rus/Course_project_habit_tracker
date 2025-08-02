@@ -1,9 +1,11 @@
-from django.core.management.base import BaseCommand
-from django.contrib.auth import get_user_model
-from habits.models import Habit
-from faker import Faker
 import random
 from datetime import time
+
+from django.contrib.auth import get_user_model
+from django.core.management.base import BaseCommand
+from faker import Faker
+
+from habits.models import Habit
 
 User = get_user_model()
 fake = Faker("ru_RU")
