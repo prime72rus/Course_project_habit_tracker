@@ -64,6 +64,10 @@ class Habit(models.Model):
         default=False,
         verbose_name="Признак публичности",
     )
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name="Признак активности привычки"
+    )
 
     class Meta:
         verbose_name = "Привычка",
