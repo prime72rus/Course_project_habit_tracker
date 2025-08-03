@@ -27,6 +27,8 @@
 - [Celery](https://docs.celeryq.dev/en/stable/django/first-steps-with-django.html)
 - [Celery-beat](https://django-celery-beat.readthedocs.io/en/latest/)
 - [Poetry](https://python-poetry.org/)
+- [Telegram Bot API](https://core.telegram.org/api)
+- [Redis](https://pypi.org/project/redis/)
 
 ## Использование
 Клонируйте репозиторий по ссылке https://github.com/prime72rus/Course_project_habit_tracker.git
