@@ -16,7 +16,6 @@ class UserTests(APITestCase):
     def setUp(self):
         """Инициализация тестовых данных"""
         self.client = APIClient()
-        # Создаем тестового администратора
         self.admin = User.objects.create(
             email="admin@example.com",
             password="adminpass",
@@ -74,7 +73,6 @@ class UserTests(APITestCase):
         # Staff should not see superusers
         self.assertEqual(len(response.data), 2)  # user + staff
 
-    # --- USER DETAIL TESTS ---
     def test_user_detail_as_owner(self):
         """Тест просмотра профиля владельцем"""
         self.client.force_authenticate(user=self.user)
@@ -155,6 +153,7 @@ class UserTests(APITestCase):
 
 
 class IsOwnerPermissionTests(TestCase):
+    """Тестирование разрешения IsOwner"""
     def setUp(self):
         self.factory = APIRequestFactory()
         self.user = User.objects.create(

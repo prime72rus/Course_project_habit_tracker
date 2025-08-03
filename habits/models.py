@@ -7,6 +7,7 @@ class Habit(models.Model):
     Модель привычки
     """
 
+    id: models.AutoField
     PERIODICITY_CHOICES = [
         (1, "Ежедневно"),
         (2, "Раз в 2 дня"),
