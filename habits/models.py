@@ -8,15 +8,6 @@ class Habit(models.Model):
     """
 
     id: models.AutoField
-    PERIODICITY_CHOICES = [
-        (1, "Ежедневно"),
-        (2, "Раз в 2 дня"),
-        (3, "Раз в 3 дня"),
-        (4, "Раз в 4 дня"),
-        (5, "Раз в 5 дней"),
-        (6, "Раз в 6 дней"),
-        (7, "Раз в неделю"),
-    ]
 
     owner = models.ForeignKey(
         "users.User",
@@ -27,6 +18,8 @@ class Habit(models.Model):
     )
     place = models.CharField(
         max_length=255,
+        null=True,
+        blank=True,
         verbose_name="Место выполнения",
     )
     time_action = models.TimeField(
@@ -49,9 +42,8 @@ class Habit(models.Model):
         verbose_name="Связанная привычка",
     )
     periodicity = models.PositiveSmallIntegerField(
-        choices=PERIODICITY_CHOICES,
         default=1,
-        verbose_name="Периодичность (дни)",
+        verbose_name="Периодичность (ежедневно)",
     )
     reward = models.CharField(
         max_length=255,
