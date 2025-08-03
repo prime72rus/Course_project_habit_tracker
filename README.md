@@ -41,6 +41,10 @@
 ```sh
   poetry install
 ```
+### Документация по использованию API приложения
+
+http://localhost:8000/swagger/
+http://localhost:8000/redoc/
 
 ### Запуск Development сервера
 Чтобы запустить сервер для разработки, выполните команду:
