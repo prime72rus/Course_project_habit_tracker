@@ -120,7 +120,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "mkdir -p ~/app"
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "chmod -R 755 ~/app"
-          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ./.env ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:~/app/.env
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $GITHUB_WORKSPACE/.env ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:~/app/.env
           scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $GITHUB_WORKSPACE/deploy/docker-compose.yml ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:~/app/docker-compose.yml
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "mkdir -p ~/app/nginx"
           scp -r -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ./nginx/* ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:~/app/nginx/
