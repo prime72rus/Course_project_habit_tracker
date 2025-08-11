@@ -39,10 +39,12 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v3
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.13"
+
       - name: Cache Poetry dependencies
         uses: actions/cache@v3
         with:
@@ -52,14 +54,34 @@ jobs:
           key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
           restore-keys: |
             ${{ runner.os }}-poetry-
+
       - name: Install poetry
         run: |
           curl -sSL https://install.python-poetry.org | python3 - --version 1.8.4
           echo "$HOME/.local/bin" >> $GITHUB_PATH
+
       - name: Install dependencies
         run: |
           poetry install --no-root
+
       - name: Run tests
         run: |
           source $(poetry env info --path)/bin/activate
           python manage.py test
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Log in Docker hub
+        run: echo ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
+
+      - name: Build Docker image
+        run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/Habit_tracker:${{ github.sha }} .
+
+      - name: Push Docker image in Docker hub
+        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/Habit_tracker:${{ github.sha }}
