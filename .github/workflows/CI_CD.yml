@@ -94,11 +94,6 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
 
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
       - name: Create .env.docker file
         run: |
           cat <<EOT > .env.docker
@@ -116,6 +111,11 @@ jobs:
           DEBUG=${{ secrets.DEBUG }}
           EOT
 
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
       - name: Deploy to server
         run: |
           ssh -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "mkdir -p ~/app"
@@ -124,7 +124,7 @@ jobs:
           scp -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null $GITHUB_WORKSPACE/deploy/docker-compose.yml ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:~/app/docker-compose.yml
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "mkdir -p ~/app/nginx"
           scp -r -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ./nginx/* ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:~/app/nginx/
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << EOF
           cd ~/app
           docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
           docker-compose down
