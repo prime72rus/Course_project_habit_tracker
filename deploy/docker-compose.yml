@@ -34,7 +34,7 @@ services:
       sh -c "python manage.py migrate --noinput && \
       python manage.py collectstatic -c --noinput && \
       gunicorn config.wsgi:application --bind 0.0.0.0:8000"
-    env_file: .env.docker
+    env_file: .env
     expose:
       - "8000"
     healthcheck:
@@ -65,7 +65,7 @@ services:
   celery_worker:
     image: ${DOCKER_HUB_USERNAME}/habits:${GIT_SHA}
     command: celery -A config worker --loglevel=info
-    env_file: .env.docker
+    env_file: .env
     depends_on:
       db:
         condition: service_healthy
@@ -77,7 +77,7 @@ services:
   celery_beat:
     image: ${DOCKER_HUB_USERNAME}/habits:${GIT_SHA}
     command: celery -A config beat --loglevel=info
-    env_file: .env.docker
+    env_file: .env
     healthcheck:
       test: [ "CMD-SHELL", "celery --app config inspect ping" ]
       interval: 30s
