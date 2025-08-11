@@ -85,3 +85,48 @@ jobs:
 
       - name: Push Docker image in Docker hub
         run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/habits:${{ github.sha }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Create .env file
+        run: |
+          cat <<EOT > .env
+          SECRET_KEY=${{ secrets.SECRET_KEY }}
+          ENGINE=${{ secrets.ENGINE }}
+          NAME=${{ secrets.NAME }}
+          USER=${{ secrets.USER }}
+          PASSWORD=${{ secrets.PASSWORD }}
+          HOST=${{ secrets.HOST }}
+          PORT=${{ secrets.PORT }}
+          CELERY_BROKER_URL=${{ secrets.CELERY_BROKER_URL }}
+          CELERY_RESULT_BACKEND=${{ secrets.CELERY_RESULT_BACKEND }}
+          DOCKER_HUB_USERNAME=${{ secrets.DOCKER_HUB_USERNAME }}
+          GIT_SHA=${{ github.sha }}
+          DEBUG=${{ secrets.DEBUG }}
+          EOT
+
+      - name: Deploy to server
+        run: |
+          ssh -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "mkdir -p ~/app"
+          ssh -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "chmod -R 755 ~/app"
+          scp -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null ./.env ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:~/app/.env
+          scp -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null $GITHUB_WORKSPACE/docker-compose.yml ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:~/app/docker-compose.yml
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "mkdir -p ~/app/nginx"
+          scp -r -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ./nginx/* ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:~/app/nginx/
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          cd ~/app
+          docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
+          docker-compose down
+          docker-compose up -d
+          EOF
