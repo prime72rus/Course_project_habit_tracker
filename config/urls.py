@@ -16,10 +16,16 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls.conf import path, include
+from django.http import JsonResponse
+from django.urls.conf import include, path
 from drf_spectacular.views import (
     SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 )
+
+
+def health_check(request):
+    return JsonResponse({"status": "ok"})
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -34,5 +40,6 @@ urlpatterns = [
         "redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"
     ),
     path("", include("users.urls", namespace="users")),
-    path("", include("habits.urls", namespace="habits"))
+    path("", include("habits.urls", namespace="habits")),
+    path('health/', health_check),
 ]

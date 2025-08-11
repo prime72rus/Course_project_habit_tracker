@@ -1,6 +1,5 @@
 from celery import shared_task
 from django.utils import timezone
-from django_celery_beat.models import CrontabSchedule, PeriodicTask
 
 from habits.models import Habit
 from habits.services import prepare_habit_message, send_tg_message
@@ -26,25 +25,3 @@ def send_daily_habit_reminders():
             print(f"Sent reminder for habit {habit.id} to {habit.owner.email}")
         else:
             print(f"Failed to send reminder for habit {habit.id}")
-
-
-@shared_task
-def setup_daily_reminders():
-    """Настройка ежедневной проверки привычек"""
-
-    schedule, _ = CrontabSchedule.objects.get_or_create(
-        minute="*",
-        hour="*",
-        day_of_week="*",
-        day_of_month="*",
-        month_of_year="*",
-    )
-
-    PeriodicTask.objects.update_or_create(
-        name="Daily habit reminders",
-        defaults={
-            "crontab": schedule,
-            "task": "habits.tasks.send_daily_habit_reminders",
-            "enabled": True,
-        },
-    )

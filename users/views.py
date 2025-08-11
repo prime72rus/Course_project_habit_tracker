@@ -20,6 +20,7 @@ class UserListAPIView(ListAPIView):
 
 class UserRetrieveAPIView(RetrieveAPIView):
     permission_classes = [IsAuthenticated, IsSuperUser | IsAdminUser | IsOwner]
+    lookup_field = "pk"
 
     def get_serializer_class(self):
         if self.request.user.is_staff:
@@ -62,6 +63,7 @@ class UserUpdateAPIView(UpdateAPIView):
 
 class UserDestroyAPIView(DestroyAPIView):
     permission_classes = [IsAuthenticated, IsSuperUser | IsAdminUser]
+    serializer_class = UserAdminSerializer
 
     def get_queryset(self):
         if self.request.user.is_superuser:
