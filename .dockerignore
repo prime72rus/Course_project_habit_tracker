@@ -5,3 +5,4 @@
 !manage.py
 !poetry.lock
 !pyproject.toml
+!.github
