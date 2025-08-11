@@ -115,8 +115,6 @@ jobs:
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Deploy to server
         run: |
           ssh -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "mkdir -p ~/app"
           ssh -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "chmod -R 755 ~/app"
