@@ -24,50 +24,44 @@ jobs:
         run: |
           flake8 .
 
-    test:
-      needs: lint
-      runs-on: ubuntu-latest
-      services:
-        redis:
-          image: redis
-          ports:
-            - 6379:6379
-          options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
-      env:
-        SECRET_KEY: ${{ secrets.SECRET_KEY }}
-        DEBUG: ${{ secrets.DEBUG }}
-        CELERY_BROKER_URL: redis://localhost:6379/0
-        CELERY_RESULT_BACKEND: redis://localhost:6379/0
-
-      steps:
-        - name: Check out code
-          uses: actions/checkout@v3
-
-        - name: Set up Python
-          uses: actions/setup-python@v4
-          with:
-            python-version: "3.13"
-
-        - name: Cache Poetry dependencies
-          uses: actions/cache@v3
-          with:
-            path: |
-              ~/.cache/pypoetry
-              ~/.venv
-            key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
-            restore-keys: |
-              ${{ runner.os }}-poetry-
-
-        - name: Install poetry
-          run: |
-            curl -sSL https://install.python-poetry.org | python3 - --version 1.8.4
-            echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-        - name: Install dependencies
-          run: |
-            poetry install --no-root
-
-        - name: Run tests
-          run: |
-            source $(poetry env info --path)/bin/activate
-            python manage.py test
+  test:
+    needs: lint
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+        options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
+    env:
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      DEBUG: ${{ secrets.DEBUG }}
+      CELERY_BROKER_URL: redis://localhost:6379/0
+      CELERY_RESULT_BACKEND: redis://localhost:6379/0
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.13"
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/pypoetry
+            ~/.venv
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+      - name: Install poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 - --version 1.8.4
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+      - name: Install dependencies
+        run: |
+          poetry install --no-root
+      - name: Run tests
+        run: |
+          source $(poetry env info --path)/bin/activate
+          python manage.py test
