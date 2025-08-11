@@ -99,9 +99,9 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Create .env file
+      - name: Create .env.docker file
         run: |
-          cat <<EOT > .env
+          cat <<EOT > .env.docker
           SECRET_KEY=${{ secrets.SECRET_KEY }}
           ENGINE=${{ secrets.ENGINE }}
           NAME=${{ secrets.NAME }}
@@ -120,7 +120,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "mkdir -p ~/app"
           ssh -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "chmod -R 755 ~/app"
-          scp -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null ./.env ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:~/app/.env
+          scp -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null ./.env.docker ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:~/app/.env.docker
           scp -o StrictHostKeyChecking=no  -o UserKnownHostsFile=/dev/null $GITHUB_WORKSPACE/docker-compose.yml ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:~/app/docker-compose.yml
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "mkdir -p ~/app/nginx"
           scp -r -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ./nginx/* ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:~/app/nginx/
