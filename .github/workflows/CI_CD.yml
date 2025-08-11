@@ -126,7 +126,7 @@ jobs:
           scp -r -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ./nginx/* ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:~/app/nginx/
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << EOF
           cd ~/app
-          docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
+          docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/habits:${{ github.sha }}
           docker compose down
           docker compose up -d
           EOF
